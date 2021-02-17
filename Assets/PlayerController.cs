@@ -5,10 +5,11 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     // Rörelse-variabler, [SerializeField] gör dessa synliga i "Inspector" i Unity.
-    // Acceleration av karaktär
+    // Acceleration av karaktär på mark eller i luft.
     [SerializeField] private float accelerationGround = 20.0f;
     [SerializeField] private float accelerationAir = 20.0f;
 
+    //Olika luftmostånd om vi är på mark eller i luft.
     [SerializeField] private float dragGround = 3.0f;
     [SerializeField] private float dragAir = 0.0f;
 
@@ -27,6 +28,7 @@ public class PlayerController : MonoBehaviour
     //Nuvarande accelerations-multiplicerare
     private float currentAcceleration = 0;
 
+    // Håller i rotations-information så vi kan använda den i FixedUpdate för att påverka fysiken.
     private float rotation = 0;
 
     void Start()
@@ -57,9 +59,12 @@ public class PlayerController : MonoBehaviour
         if (onGround && Input.GetKeyDown(KeyCode.Space)) 
             rb.AddForce(Vector3.up * jumpVelocity, ForceMode.VelocityChange);
 
+        //Om vi är på marken, ändrar vi luftmoståndet och hur snabbt vi accelererar
         if (onGround)
         {
+            // Sätt luftmostånd
             rb.drag = dragGround;
+            // Sätt accelerations-hastighet
             currentAcceleration = accelerationGround;
         }
         else
@@ -81,7 +86,9 @@ public class PlayerController : MonoBehaviour
         // Då lastInput är en riktning så använder vi variabeln "acceleration" för att ändra hur snabbt karaktären rör sig.
         rb.AddRelativeForce(lastInput * currentAcceleration, ForceMode.Acceleration);
 
+        //Sätter vår rotations-hastighet för att rotera spelaren.
         rb.angularVelocity = new Vector3(0, rotation, 0);
+        // Ser till att nollställa/återställa rotationen till 0 så att den inte bara ökar konstant.
         rotation = 0;
         // Sätter så att vi inte är på marken vid början av fysikens uppdatering.
         // Kollisioner sker efter FixedUpdate, så detta "nollställer" vår "på mark" status.

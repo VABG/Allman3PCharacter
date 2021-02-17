@@ -14,7 +14,7 @@ public class DetectGround : MonoBehaviour
     }
     private void OnTriggerStay(Collider other)
     {
-        //sätt så vår spelar-karaktär är på marken. OnTriggerStay anropas EFTER FixedUpdate
+        // Sätter så vår spelar-karaktär är på marken. OnTriggerStay(denna metoden) anropas EFTER FixedUpdate
         p.SetOnGround(true);
     }
 }
