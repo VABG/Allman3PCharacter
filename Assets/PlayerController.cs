@@ -19,6 +19,12 @@ public class PlayerController : MonoBehaviour
     // Det värdet som visar om vi är på mark eller inte.
     private bool onGround;
 
+    [SerializeField] private float canJumpTime = 0.1f;
+    private float offGroundTimer = 0;
+    private bool canJump = false;
+
+    private float stuckDetectionTimer = 0;
+
     // Vår rigidbody som vi förflyttar karaktären med
     private Rigidbody rb;
     
@@ -55,13 +61,13 @@ public class PlayerController : MonoBehaviour
 
         rotation += Input.GetAxis("Mouse X");
 
-        // Kollar om vi är på marken, och har tryckt space
-        if (onGround && Input.GetKeyDown(KeyCode.Space)) 
-            rb.AddForce(Vector3.up * jumpVelocity, ForceMode.VelocityChange);
-
         //Om vi är på marken, ändrar vi luftmoståndet och hur snabbt vi accelererar
         if (onGround)
         {
+            offGroundTimer = 0;
+            canJump = true;
+
+            rb.useGravity = false;
             // Sätt luftmostånd
             rb.drag = dragGround;
             // Sätt accelerations-hastighet
@@ -69,11 +75,42 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            offGroundTimer += Time.deltaTime;
+            if (offGroundTimer <= canJumpTime) canJump = true;
+            else canJump = false;
+
+            rb.useGravity = true;
             rb.drag = dragAir;
             currentAcceleration = accelerationAir;
         }
+        bool triedJumping = false;
+
+        // Kollar om vi kan hoppa, och har tryckt space
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            triedJumping = true;
+            if (canJump)
+            {
+                rb.AddForce(Vector3.up * jumpVelocity, ForceMode.VelocityChange);
+                offGroundTimer = canJumpTime;
+            }
+        }
+
+        if (!onGround && !canJump && lastInput.magnitude > 0 && rb.velocity.magnitude < 0.05f)
+        {
+            stuckDetectionTimer += Time.deltaTime;
+            if (stuckDetectionTimer > 0.2f)
+            {
+                if (triedJumping) rb.AddForce(Vector3.up * jumpVelocity, ForceMode.VelocityChange);
+            }
+        }
+        else
+        {
+            stuckDetectionTimer = 0;
+        }
+
     }
-    
+
     // Metod som ändrar det som behövs när spelaren är på marken.
     public void SetOnGround(bool onGround)
     {
@@ -85,7 +122,6 @@ public class PlayerController : MonoBehaviour
         // Lägg till kraft på vår kraktär med acceleration baserat på vår input (lastInput)
         // Då lastInput är en riktning så använder vi variabeln "acceleration" för att ändra hur snabbt karaktären rör sig.
         rb.AddRelativeForce(lastInput * currentAcceleration, ForceMode.Acceleration);
-
         //Sätter vår rotations-hastighet för att rotera spelaren.
         rb.angularVelocity = new Vector3(0, rotation, 0);
         // Ser till att nollställa/återställa rotationen till 0 så att den inte bara ökar konstant.

@@ -54,7 +54,7 @@ public class FollowCamera : MonoBehaviour
     void Update()
     {
         // Kolla på vårt "mål" som heter "lookAt"
-        transform.LookAt(lookAt, Vector3.up);
+        transform.LookAt(lookAt);
 
         // Hämtar rotation från vår input från musen (Input Manager i menyn Edit->Project Settings->Input Manager)
         rotation = -Input.GetAxis("Mouse Y");
