@@ -19,6 +19,7 @@ public class FollowCamera : MonoBehaviour
 
     // Vårt standard-avstånd från spelaren (vår look-at)
     float defaultDistance;
+
     // Nuvarande avstånd (om det behövs)
     float currentDistance;
 
@@ -34,8 +35,7 @@ public class FollowCamera : MonoBehaviour
         // Hitta vår spelare i scenen
         p = FindObjectOfType<PlayerController>();
         // Kolla på vårt "lookAt"-mål med kameran
-        transform.LookAt(lookAt, Vector3.up);
-
+        transform.LookAt(lookAt);
 
         // Om man tar en vektor minus en annan vektor så vår man deras relativa position till varandra
         // Sedan kan man använda det för att hitta avstånd.
@@ -45,6 +45,7 @@ public class FollowCamera : MonoBehaviour
         cameraPositionFarthest = transform.localPosition;
         // Närmsta position sätts här
         cameraPositionNearest = lookAt.position;
+
         //Göm vår muspekare och lås den till vårt spel-fönster
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
@@ -91,7 +92,7 @@ public class FollowCamera : MonoBehaviour
         //Anropas här för att förhindra att kameran "skakar" eller laggar.
         // Linjär interpolering mellan nuvarande position på vår "parent", dvs förälder och spelar-positionen.
         // * 6 gör att kameran rör sig snabbare mot spelar-positionen.
-        parentTransform.position = Vector3.Lerp(parentTransform.position, p.transform.position, 6 * Time.deltaTime);
+        parentTransform.position = Vector3.Lerp(parentTransform.position, p.transform.position, 5 * Time.deltaTime);
         // Hämta nuvarande rotation i lättare att modifiera "vinklar" för både spelaren och vår föräldern.
         Vector3 pRot = parentTransform.rotation.eulerAngles;
         Vector3 playerRot = p.transform.rotation.eulerAngles;

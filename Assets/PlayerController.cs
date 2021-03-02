@@ -126,8 +126,5 @@ public class PlayerController : MonoBehaviour
         rb.angularVelocity = new Vector3(0, rotation, 0);
         // Ser till att nollställa/återställa rotationen till 0 så att den inte bara ökar konstant.
         rotation = 0;
-        // Sätter så att vi inte är på marken vid början av fysikens uppdatering.
-        // Kollisioner sker efter FixedUpdate, så detta "nollställer" vår "på mark" status.
-        SetOnGround(false);
     }
 }
